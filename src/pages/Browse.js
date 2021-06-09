@@ -1,8 +1,6 @@
-import React from "react"
-import BrowseContainer from "../containers/BrowseContainer"
+import React from 'react';
+import { BrowseContainer } from '../containers/browse';
 
-function Browse() {
-  return <BrowseContainer />
+export default function Browse() {
+    return <BrowseContainer />;
 }
-
-export default Browse
