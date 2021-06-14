@@ -1,14 +1,16 @@
-import React, { useState, useContext } from "react"
-import { Header } from "../components"
+import React, { useState, useEffect, useContext } from "react"
+import { Card, Loading, Header } from "../components"
 import * as ROUTES from "../constants/routes"
 import FirebaseContext from "../context/firebase"
 import SelectProfileContainer from "./SelectProfileContainer"
 import FooterContainer from "./FooterContainer"
 
-function BrowseContainer() {
+function BrowseContainer({ slides }) {
   const [category, setCategory] = useState("series")
   const [profile, setProfile] = useState({})
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [slideRows, setSlideRows] = useState([])
 
   const { firebase } = useContext(FirebaseContext)
 
@@ -17,8 +19,20 @@ function BrowseContainer() {
     photoURL: "1",
   }
 
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false)
+    }, 3000)
+  }, [user])
+
+  useEffect(() => {
+    setSlideRows(slides[category])
+  }, [slides, category])
+
   return profile.displayName ? (
     <>
+      {loading ? <Loading src={user.photoURL} /> : <Loading.ReleaseBody />}
+
       <Header src="joker1" dontShowOnSmallViewPort>
         <Header.Frame>
           <Header.Group>
@@ -40,6 +54,26 @@ function BrowseContainer() {
               Films
             </Header.Link>
           </Header.Group>
+          <Header.Group>
+            <Header.Search
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            />
+            <Header.Profile>
+              <Header.Picture src={user.photoURL} />
+              <Header.Dropdown>
+                <Header.Group>
+                  <Header.Picture src={user.photoURL} />
+                  <Header.Link>{user.displayName}</Header.Link>
+                </Header.Group>
+                <Header.Group>
+                  <Header.Link onClick={() => firebase.auth().signOut()}>
+                    Sign out
+                  </Header.Link>
+                </Header.Group>
+              </Header.Dropdown>
+            </Header.Profile>
+          </Header.Group>
         </Header.Frame>
 
         <Header.Feature>
@@ -54,6 +88,30 @@ function BrowseContainer() {
           <Header.PlayButton>Play</Header.PlayButton>
         </Header.Feature>
       </Header>
+
+      <Card.Group>
+        {slideRows.map((slideItem) => (
+          <Card key={`${category}-${slideItem.title.toLowerCase()}`}>
+            <Card.Title>{slideItem.title}</Card.Title>
+            <Card.Entities>
+              {slideItem.data.map((item) => (
+                <Card.Item key={item.docId} item={item}>
+                  <Card.Image
+                    src={`/images/${category}/${item.genre}/${item.slug}/small.jpg`}
+                  />
+                  <Card.Meta>
+                    <Card.SubTitle>{item.title}</Card.SubTitle>
+                    <Card.Text>{item.description}</Card.Text>
+                  </Card.Meta>
+                </Card.Item>
+              ))}
+            </Card.Entities>
+            <Card.Feature>
+              <p>I am the feature!</p>
+            </Card.Feature>
+          </Card>
+        ))}
+      </Card.Group>
       <FooterContainer />
     </>
   ) : (
