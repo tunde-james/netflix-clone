@@ -1,6 +1,0 @@
-*.html linguist-detectable=true
-*.css linguist-detectable=true
-*.js linguist-detectable=true
-*.reactjs linguist-detectable=true
-*.styled-component linguist-detectable=true
-*.firebase linguist-detectable=true
